@@ -16,6 +16,7 @@ import PrepPlanPage from './PrepPlanPage';
 import JobDescriptionPage from './JobDescriptionPage';
 import GapAnalysisPage from './GapAnalysisPage';
 import MockInterviewPage from './MockInterviewPage';
+import HistoryPage from './HistoryPage';
 import SettingsPage from './SettingsPage';
 import AnimatedCounter from '../components/AnimatedCounter';
 import CircularProgress from '../components/CircularProgress';
@@ -216,10 +217,13 @@ export default function DashboardPage({ onNavigate }) {
           <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 rounded-lg hover:bg-[#F3F4F6] text-[#6B7280] cursor-pointer">
             <Menu size={20} />
           </button>
+          {activeNav === 'history' && (
+            <span className="text-sm font-extrabold text-[#111827] mr-1 hidden sm:inline select-none">History</span>
+          )}
           <div className="relative flex-1 max-w-xs">
             <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9CA3AF]" />
             <input type="text" 
-              placeholder={activeNav === 'job' ? 'Search templates...' : activeNav === 'upload' ? 'Search files...' : 'Search insights...'}
+              placeholder={activeNav === 'job' ? 'Search templates...' : activeNav === 'upload' ? 'Search files...' : activeNav === 'history' ? 'Search activities...' : 'Search insights...'}
               className="w-full pl-9 pr-4 py-2 bg-[#F3F4F6] rounded-full text-sm text-[#111827] placeholder:text-[#9CA3AF] outline-none focus:ring-2 focus:ring-[#2563EB]/25 transition-all" />
           </div>
           <div className="flex items-center gap-2 ml-auto">
@@ -241,7 +245,24 @@ export default function DashboardPage({ onNavigate }) {
         {/* MAIN SCROLLABLE */}
         <main id="dash-scroll" className="flex-1 overflow-y-auto px-5 lg:px-10 py-8">
           <motion.div variants={containerVar} initial="hidden" animate="visible" className="max-w-[1400px] mx-auto">
-            {activeNav === 'upload' ? <UploadResumePage /> : activeNav === 'job' ? <JobDescriptionPage /> : activeNav === 'gap' ? <GapAnalysisPage /> : activeNav === 'prep' ? <PrepPlanPage /> : activeNav === 'interview' ? <MockInterviewPage /> : activeNav === 'settings' ? <SettingsPage initialTab="general" /> : activeNav === 'profile' ? <SettingsPage initialTab="profile" /> : <>
+            {activeNav === 'upload' ? (
+              <UploadResumePage />
+            ) : activeNav === 'job' ? (
+              <JobDescriptionPage />
+            ) : activeNav === 'gap' ? (
+              <GapAnalysisPage />
+            ) : activeNav === 'prep' ? (
+              <PrepPlanPage />
+            ) : activeNav === 'interview' ? (
+              <MockInterviewPage />
+            ) : activeNav === 'settings' ? (
+              <SettingsPage initialTab="general" />
+            ) : activeNav === 'profile' ? (
+              <SettingsPage initialTab="profile" />
+            ) : activeNav === 'history' ? (
+              <HistoryPage />
+            ) : (
+              <>
                 {/* 1. WELCOME */}
                 <motion.div variants={itemVar} className="mb-8">
                   <h1 className="text-3xl lg:text-[2.2rem] font-extrabold text-[#111827] tracking-tight">
@@ -678,7 +699,7 @@ export default function DashboardPage({ onNavigate }) {
                 ))}
               </div>
             </footer>
-          </>}
+          </>)}
           </motion.div>
         </main>
       </div>
