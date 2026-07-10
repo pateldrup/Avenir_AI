@@ -24,6 +24,7 @@ import { LineTooltip, BarTooltip } from '../components/Tooltips';
 import KebabMenu from '../components/KebabMenu';
 import NotificationBell from '../components/NotificationBell';
 import ProfileDropdown from '../components/ProfileDropdown';
+import Sidebar from '../components/Sidebar';
 
 
 /* ─── Mock Data ─── */
@@ -42,15 +43,6 @@ const interviewHistory = [
   { topic: 'System Design', score: '8/10', date: 'Jul 8, 2024', colorClass: 'text-[#2563EB]' },
   { topic: 'Behavioral Questions', score: '9/10', date: 'Jul 5, 2024', colorClass: 'text-[#7C3AED]' },
   { topic: 'Technical Deep-Dive', score: '7/10', date: 'Jul 1, 2024', colorClass: 'text-[#10B981]' },
-];
-const navItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'upload', label: 'Upload Resume', icon: Upload },
-  { id: 'job', label: 'Job Description', icon: FileText },
-  { id: 'gap', label: 'Gap Analysis', icon: GitCompare },
-  { id: 'prep', label: 'Prep Plan', icon: ClipboardList },
-  { id: 'interview', label: 'Mock Interview', icon: Mic },
-  { id: 'history', label: 'History', icon: History },
 ];
 const BAR_COLORS = ['#2563EB', '#4F46E5', '#7C3AED', '#10B981'];
 const SPARKLINE = [40, 55, 48, 62, 58, 72, 78];
@@ -148,107 +140,25 @@ export default function DashboardPage({ onNavigate }) {
       </AnimatePresence>
 
       {/* SIDEBAR */}
-      <aside className={`fixed lg:static z-40 h-full w-[260px] bg-white border-r border-[#E5E7EB] flex flex-col shrink-0 transition-transform duration-300
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
-
-        <div className="px-6 pt-6 pb-5 border-b border-[#E5E7EB]">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm"
-              style={{ background: 'linear-gradient(135deg,#2563EB,#7C3AED)' }}>
-              <LayoutDashboard size={15} className="text-white" />
-            </div>
-            <div>
-              <p className="text-base font-extrabold text-[#2563EB] leading-tight">Avenir AI</p>
-              <p className="text-[10px] font-medium text-[#6B7280]">Enterprise Tier</p>
-            </div>
-          </div>
-        </div>
-
-        <nav className="flex-1 px-3 py-4 overflow-y-auto space-y-0.5">
-          {navItems.map(({ id, label, icon: Icon }) => {
-            const active = activeNav === id;
-            return (
-              <motion.button key={id} whileHover={{ x: 2 }} whileTap={{ scale: 0.97 }}
-                onClick={() => { setActiveNav(id); setSidebarOpen(false); }}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer
-                  ${active ? 'bg-[#EFF6FF] text-[#2563EB] font-semibold' : 'text-[#6B7280] hover:bg-[#F8FAFC] hover:text-[#111827]'}`}>
-                <Icon size={18} className={active ? 'text-[#2563EB]' : 'text-[#9CA3AF]'} />
-                {label}
-                {active && (
-                  <motion.div layoutId="navPill" className="ml-auto w-1.5 h-5 rounded-full"
-                    style={{ background: 'linear-gradient(to bottom,#2563EB,#7C3AED)' }} />
-                )}
-              </motion.button>
-            );
-          })}
-          <div className="w-full h-px bg-[#E5E7EB] my-2" />
-          <motion.button whileHover={{ x: 2 }} whileTap={{ scale: 0.97 }} onClick={() => { setActiveNav('settings'); setSidebarOpen(false); }}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer ${activeNav === 'settings' ? 'bg-[#EFF6FF] text-[#2563EB] font-semibold' : 'text-[#6B7280] hover:bg-[#F8FAFC] hover:text-[#111827]'}`}>
-            <Settings size={18} className={activeNav === 'settings' ? 'text-[#2563EB]' : 'text-[#9CA3AF]'} />
-            Settings
-            {activeNav === 'settings' && <motion.div layoutId="navPillBottom" className="ml-auto w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(to bottom,#2563EB,#7C3AED)' }} />}
-          </motion.button>
-          <motion.button whileHover={{ x: 2 }} whileTap={{ scale: 0.97 }} onClick={() => { setActiveNav('profile'); setSidebarOpen(false); }}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer ${activeNav === 'profile' ? 'bg-[#EFF6FF] text-[#2563EB] font-semibold' : 'text-[#6B7280] hover:bg-[#F8FAFC] hover:text-[#111827]'}`}>
-            <User size={18} className={activeNav === 'profile' ? 'text-[#2563EB]' : 'text-[#9CA3AF]'} />
-            Profile
-            {activeNav === 'profile' && <motion.div layoutId="navPillBottom" className="ml-auto w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(to bottom,#2563EB,#7C3AED)' }} />}
-          </motion.button>
-        </nav>
-
-        <div className="px-4 pb-6 pt-2">
-          <div className="bg-[#EEF2FF] rounded-xl p-4 border border-[#E0E7FF]">
-            <p className="text-[10px] font-bold text-[#4F46E5] uppercase tracking-widest mb-1.5">Pro Plan</p>
-            <p className="text-xs text-[#4B5563] font-medium leading-relaxed mb-4">
-              Unlock advanced AI analysis and unlimited resumes.
-            </p>
-            <button className="w-full py-2 bg-[#0051C9] hover:bg-[#0042A5] text-white text-xs font-bold rounded-lg shadow-sm transition-colors cursor-pointer">
-              Upgrade to Pro
-            </button>
-          </div>
-        </div>
-      </aside>
-
+      <Sidebar 
+        sidebarOpen={sidebarOpen} 
+        setSidebarOpen={setSidebarOpen} 
+        activeNav={activeNav} 
+        setActiveNav={setActiveNav} 
+        darkMode={darkMode} 
+        setDarkMode={setDarkMode} 
+        onNavigate={onNavigate} 
+      />
       {/* RIGHT AREA */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-
-        {/* TOP NAVBAR */}
-        <header className={`sticky top-0 z-20 flex items-center gap-4 px-5 lg:px-8 py-3 bg-white/70 backdrop-blur-lg border-b border-[#E5E7EB] transition-all duration-300 ${scrolled ? 'shadow-md' : ''}`}>
-          <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 rounded-lg hover:bg-[#F3F4F6] text-[#6B7280] cursor-pointer">
-            <Menu size={20} />
-          </button>
-          {activeNav === 'history' && (
-            <span className="text-sm font-extrabold text-[#111827] mr-1 hidden sm:inline select-none">History</span>
-          )}
-          <div className="relative flex-1 max-w-xs">
-            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9CA3AF]" />
-            <input type="text" 
-              placeholder={activeNav === 'job' ? 'Search templates...' : activeNav === 'upload' ? 'Search files...' : activeNav === 'history' ? 'Search activities...' : 'Search insights...'}
-              className="w-full pl-9 pr-4 py-2 bg-[#F3F4F6] rounded-full text-sm text-[#111827] placeholder:text-[#9CA3AF] outline-none focus:ring-2 focus:ring-[#2563EB]/25 transition-all" />
-          </div>
-          <div className="flex items-center gap-2 ml-auto">
-            <NotificationBell />
-            <motion.button whileTap={{ scale: 0.88 }} onClick={() => setDarkMode(p => !p)} id="dark-mode-toggle"
-              className="p-2 rounded-full hover:bg-[#F3F4F6] transition-colors cursor-pointer text-[#6B7280]">
-              <AnimatePresence mode="wait" initial={false}>
-                {darkMode
-                  ? <motion.span key="sun" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.18 }}><Sun size={20} /></motion.span>
-                  : <motion.span key="moon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.18 }}><Moon size={20} /></motion.span>
-                }
-              </AnimatePresence>
-            </motion.button>
-            <div className="w-px h-7 bg-[#E5E7EB] mx-1" />
-            <ProfileDropdown onNavigate={onNavigate} />
-          </div>
-        </header>
 
         {/* MAIN SCROLLABLE */}
         <main id="dash-scroll" className="flex-1 overflow-y-auto px-5 lg:px-10 py-8">
           <motion.div variants={containerVar} initial="hidden" animate="visible" className="max-w-[1400px] mx-auto">
             {activeNav === 'upload' ? (
-              <UploadResumePage />
+              <UploadResumePage onNext={() => setActiveNav('job')} />
             ) : activeNav === 'job' ? (
-              <JobDescriptionPage />
+              <JobDescriptionPage onNext={() => setActiveNav('gap')} />
             ) : activeNav === 'gap' ? (
               <GapAnalysisPage />
             ) : activeNav === 'prep' ? (
@@ -269,7 +179,7 @@ export default function DashboardPage({ onNavigate }) {
                 Welcome back,{' '}
                 <motion.span initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.5 }}
                   style={{ background: 'linear-gradient(135deg,#2563EB,#7C3AED)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                  Alex.
+                  {localStorage.getItem('avenir_user_name')?.split(' ')[0] || 'Guest'}.
                 </motion.span>
               </h1>
               <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.65 }}
@@ -650,39 +560,7 @@ export default function DashboardPage({ onNavigate }) {
               </div>
             </div>
 
-            {/* 4. PROMO BANNER */}
-            <motion.div variants={itemVar}
-              whileHover={{ scale: 1.01, boxShadow: '0 24px 60px rgba(79,70,229,0.28)' }}
-              transition={{ duration: 0.2 }}
-              className="relative overflow-hidden rounded-2xl p-8 mb-8 cursor-default"
-              style={{ background: 'linear-gradient(135deg,#1E1B4B 0%,#4F46E5 55%,#7C3AED 100%)' }}>
 
-              <svg className="absolute right-0 top-0 h-full opacity-20 pointer-events-none" viewBox="0 0 420 220" fill="none"
-                style={{ mixBlendMode: 'screen' }}>
-                <motion.path d="M0 110 Q 105 30 210 110 T 420 110" stroke="white" strokeWidth="2" fill="none"
-                  initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ duration: 2, ease: 'easeInOut', delay: 1 }} />
-                <motion.path d="M0 145 Q 105 65 210 145 T 420 145" stroke="white" strokeWidth="1.5" fill="none"
-                  initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 0.6 }}
-                  transition={{ duration: 2, ease: 'easeInOut', delay: 1.3 }} />
-                <motion.path d="M0 75 Q 105 -5 210 75 T 420 75" stroke="white" strokeWidth="1" fill="none"
-                  initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 0.4 }}
-                  transition={{ duration: 2, ease: 'easeInOut', delay: 1.6 }} />
-                <circle cx="340" cy="60" r="50" fill="white" fillOpacity="0.04" />
-                <circle cx="370" cy="155" r="35" fill="white" fillOpacity="0.06" />
-              </svg>
-
-              <div className="relative z-10 max-w-xl">
-                <h2 className="text-xl sm:text-2xl font-extrabold text-white mb-2">Unlock AI Interview Coaching</h2>
-                <p className="text-white/80 text-sm font-medium mb-5 leading-relaxed">
-                  Practice with our real-time voice coach and get instant feedback on your tone and content.
-                </p>
-                <motion.button whileHover={{ x: 4 }} whileTap={{ scale: 0.97 }}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-white/15 hover:bg-white/25 border border-white/40 rounded-xl text-white font-bold text-sm backdrop-blur-sm transition-all cursor-pointer">
-                  Explore Coaching Features<ArrowRight size={15} />
-                </motion.button>
-              </div>
-            </motion.div>
 
             {/* FOOTER */}
             <footer className="border-t border-[#E5E7EB] pt-5 pb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">

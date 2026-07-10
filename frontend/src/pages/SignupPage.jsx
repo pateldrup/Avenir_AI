@@ -87,6 +87,8 @@ export default function SignupPage({ onNavigate }) {
         confirmPassword
       });
       localStorage.setItem('token', res.data.token);
+      localStorage.setItem('avenir_user_name', res.data.name);
+      localStorage.setItem('avenir_user_email', res.data.email);
       onNavigate('dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');
@@ -102,6 +104,8 @@ export default function SignupPage({ onNavigate }) {
         token: credentialResponse.credential,
       });
       localStorage.setItem('token', res.data.token);
+      localStorage.setItem('avenir_user_name', res.data.name);
+      localStorage.setItem('avenir_user_email', res.data.email);
       onNavigate('dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Google authentication failed');

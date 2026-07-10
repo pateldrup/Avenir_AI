@@ -30,8 +30,8 @@ import {
   Cell,
   Tooltip,
 } from 'recharts';
+import axios from 'axios';
 
-/* ─── Mock Data for Charts ─── */
 const radarData = [
   { subject: 'Design', A: 95, B: 90, fullMark: 100 },
   { subject: 'Technical', A: 50, B: 85, fullMark: 100 },
@@ -69,14 +69,39 @@ const heatMapData = [
 
 export default function GapAnalysisPage() {
   const [loading, setLoading] = useState(true);
-  const [visTab, setVisTab] = useState('bar'); // bar | radar | heatmap
+  const [analysisData, setAnalysisData] = useState(null);
+  const [error, setError] = useState(null);
+  
+  const [visTab, setVisTab] = useState('bar'); 
   const [showExpGaps, setShowExpGaps] = useState(false);
   const [hoveredCell, setHoveredCell] = useState(null);
 
-  // Simulated initial skeleton load
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1200);
-    return () => clearTimeout(timer);
+    const fetchAnalysis = async () => {
+      try {
+        const analysisId = localStorage.getItem('avenir_analysis_id');
+        const token = localStorage.getItem('token');
+        
+        if (!analysisId) {
+          setError('No recent analysis found. Please run a job description analysis first.');
+          setLoading(false);
+          return;
+        }
+
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/analysis/${analysisId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        setAnalysisData(res.data);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching analysis:', err);
+        setError('Failed to load analysis data.');
+        setLoading(false);
+      }
+    };
+
+    fetchAnalysis();
   }, []);
 
   const containerVar = {
@@ -98,10 +123,8 @@ export default function GapAnalysisPage() {
   if (loading) {
     return (
       <div className="flex flex-col gap-6 animate-pulse">
-        {/* Header Skeleton */}
         <div className="h-9 w-64 bg-gray-200 rounded-lg" />
         <div className="h-5 w-full max-w-lg bg-gray-200 rounded-md mb-6" />
-        {/* Row 1 Grid Skeletons */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="h-72 bg-gray-200 rounded-2xl" />
           <div className="h-72 bg-gray-200 rounded-2xl" />
@@ -111,24 +134,48 @@ export default function GapAnalysisPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center p-12 text-center">
+        <AlertTriangle size={48} className="text-[#EF4444] mb-4" />
+        <h2 className="text-xl font-bold text-[#111827]">{error}</h2>
+      </div>
+    );
+  }
+
+  // Derived Data
+  const atsScore = analysisData?.atsScore || 0;
+  const matchedSkills = analysisData?.matchedSkills || [];
+  const missingSkills = analysisData?.missingSkills || [];
+  const totalSkills = matchedSkills.length + missingSkills.length;
+  const matchedPercentage = totalSkills > 0 ? Math.round((matchedSkills.length / totalSkills) * 100) : 0;
+  const missingPercentage = totalSkills > 0 ? Math.round((missingSkills.length / totalSkills) * 100) : 0;
+  
+  const dynamicPieData = [
+    { name: 'Matched', value: matchedPercentage, color: '#10B981' },
+    { name: 'Missing', value: missingPercentage, color: '#EF4444' }
+  ];
+
+  const dynamicBarSkills = [
+    ...matchedSkills.slice(0, 4).map(s => ({ name: s.name, percentage: 95, level: 'Strong', color: '#10B981' })),
+    ...missingSkills.slice(0, 2).map(s => ({ name: s.name, percentage: 20, level: 'Needs Review', color: '#EF4444' }))
+  ];
+
   return (
     <div className="relative">
       <motion.div variants={containerVar} initial="hidden" animate="visible" className="flex flex-col gap-8">
         
-        {/* Header */}
         <motion.div variants={itemVar}>
           <h1 className="text-3xl lg:text-[2.2rem] font-extrabold text-[#111827] tracking-tight leading-tight">
             Gap Analysis
           </h1>
           <p className="text-[#6B7280] font-medium text-sm lg:text-base mt-2">
-            We've compared your resume against the <span className="font-bold text-[#111827]">Senior Product Designer</span> role at <span className="font-bold text-[#111827]">TechFlow</span>. Here's how you stack up.
+            We've compared your resume against the <span className="font-bold text-[#111827]">{analysisData?.jobTitle}</span> role at <span className="font-bold text-[#111827]">{analysisData?.company}</span>. Here's how you stack up.
           </p>
         </motion.div>
 
-        {/* ════════ ROW 1: THREE-COLUMN SPLIT ════════ */}
         <motion.div variants={itemVar} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          {/* Column 1: Resume Skills */}
           <motion.div whileHover={cardHover} className="bg-white rounded-2xl shadow-[0_10px_30px_rgba(15,23,42,0.08)] p-6 border border-[#E5E7EB] flex flex-col justify-between">
             <div>
               <div className="flex items-center gap-2.5 mb-6">
@@ -136,29 +183,16 @@ export default function GapAnalysisPage() {
                 <h3 className="text-sm font-extrabold text-[#111827] uppercase tracking-wider">Your Resume Skills</h3>
               </div>
               <div className="flex flex-wrap gap-2">
-                {[
-                  { name: 'UI/UX Design', status: 'green' },
-                  { name: 'Figma', status: 'green' },
-                  { name: 'React.js', status: 'amber' },
-                  { name: 'Design Systems', status: 'green' },
-                  { name: 'Three.js', status: 'red' },
-                  { name: 'Wireframing', status: 'green' },
-                ].map((skill, i) => (
+                {matchedSkills.map((skill, i) => (
                   <motion.div
-                    key={skill.name}
+                    key={skill.name + i}
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: i * 0.05, type: 'spring', stiffness: 200 }}
                     whileHover={{ scale: 1.05 }}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border select-none
-                      ${skill.status === 'green' ? 'bg-[#ECFDF5] border-emerald-200 text-emerald-700' :
-                        skill.status === 'amber' ? 'bg-[#FFFBEB] border-amber-200 text-amber-700' :
-                        'bg-[#FEF2F2] border-red-200 text-red-700'}
-                    `}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border select-none bg-[#ECFDF5] border-emerald-200 text-emerald-700`}
                   >
-                    {skill.status === 'green' ? <CheckCircle2 size={13} /> :
-                     skill.status === 'amber' ? <AlertCircle size={13} /> :
-                     <XCircle size={13} />}
+                    <CheckCircle2 size={13} />
                     {skill.name}
                   </motion.div>
                 ))}
@@ -170,9 +204,7 @@ export default function GapAnalysisPage() {
             </div>
           </motion.div>
 
-          {/* Column 2: Center Score Center */}
           <div className="flex flex-col items-center justify-center text-center p-4">
-            {/* SVG circular match score ring */}
             <div className="relative w-36 h-36 flex items-center justify-center">
               <svg width={144} height={144} className="-rotate-90 absolute inset-0">
                 <defs>
@@ -186,17 +218,16 @@ export default function GapAnalysisPage() {
                   cx={72} cy={72} r={64} fill="none" stroke="url(#scoreGrad)" strokeWidth={10} strokeLinecap="round"
                   strokeDasharray={2 * Math.PI * 64}
                   initial={{ strokeDashoffset: 2 * Math.PI * 64 }}
-                  animate={{ strokeDashoffset: 2 * Math.PI * 64 * (1 - 0.72) }}
+                  animate={{ strokeDashoffset: 2 * Math.PI * 64 * (1 - (atsScore / 100)) }}
                   transition={{ duration: 1.4, ease: 'easeOut' }}
                 />
               </svg>
               <div className="z-10 flex flex-col items-center">
-                <span className="text-4xl font-extrabold text-[#111827]">72%</span>
+                <span className="text-4xl font-extrabold text-[#111827]">{atsScore}%</span>
                 <span className="text-[9px] font-bold text-[#6B7280] tracking-widest mt-1">MATCH SCORE</span>
               </div>
             </div>
 
-            {/* AI Insights Pill with Shimmer effect */}
             <div className="mt-6 relative overflow-hidden px-4.5 py-1.5 bg-gradient-to-r from-[#EFF6FF] to-[#F5F3FF] border border-[#E5E7EB] rounded-full text-xs font-bold text-[#4F46E5] flex items-center gap-1.5 shadow-sm">
               <Sparkles size={13} className="text-[#F59E0B]" />
               <span>AI Insights: Highly Compatible</span>
@@ -208,7 +239,6 @@ export default function GapAnalysisPage() {
               />
             </div>
 
-            {/* ATS Score Indicator */}
             <div className="mt-5 w-full max-w-[200px] flex flex-col items-center">
               <div className="flex items-center justify-between w-full text-[10px] font-bold text-[#6B7280] mb-1">
                 <span>ATS Score</span>
@@ -228,20 +258,14 @@ export default function GapAnalysisPage() {
             </div>
           </div>
 
-          {/* Column 3: Job Requirements */}
           <motion.div whileHover={cardHover} className="bg-white rounded-2xl shadow-[0_10px_30px_rgba(15,23,42,0.08)] p-6 border border-[#E5E7EB] flex flex-col justify-between">
             <div>
               <div className="flex items-center gap-2.5 mb-5">
                 <Briefcase size={18} className="text-[#7C3AED]" />
                 <h3 className="text-sm font-extrabold text-[#111827] uppercase tracking-wider">Job Requirements</h3>
               </div>
-              <ul className="space-y-3.5 text-xs text-[#111827] font-medium">
-                {[
-                  'Lead the creation of scalable design systems for enterprise web applications.',
-                  'Experience with 3D web visualizations (Three.js/WebGL) is a major plus.',
-                  'Collaborate with engineers using React and Tailwind CSS.',
-                  'Conduct comprehensive user research and usability testing.',
-                ].map((req, i) => (
+              <ul className="space-y-3.5 text-xs text-[#111827] font-medium max-h-56 overflow-y-auto pr-2">
+                {missingSkills.map((req, i) => (
                   <motion.li
                     key={i}
                     initial={{ opacity: 0, x: 10 }}
@@ -249,8 +273,8 @@ export default function GapAnalysisPage() {
                     transition={{ delay: i * 0.1 }}
                     className="flex items-start gap-2.5 leading-relaxed"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] mt-1.5 shrink-0" />
-                    <span>{req}</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#EF4444] mt-1.5 shrink-0" />
+                    <span><span className="font-bold">{req.name}</span>: {req.impact}</span>
                   </motion.li>
                 ))}
               </ul>
@@ -259,16 +283,13 @@ export default function GapAnalysisPage() {
 
         </motion.div>
 
-        {/* ════════ ROW 2: SKILL MATCH VISUALIZATION ════════ */}
         <motion.div variants={itemVar} className="bg-white rounded-2xl shadow-[0_10px_30px_rgba(15,23,42,0.08)] border border-[#E5E7EB] p-6 lg:p-8">
-          {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
               <h2 className="text-base font-bold text-[#111827]">Skill Match Breakdown</h2>
               <p className="text-xs text-[#6B7280] mt-0.5">Explore details of your match profile</p>
             </div>
 
-            {/* Segmented control */}
             <div className="inline-flex bg-[#F3F4F6] rounded-xl p-1 relative z-10 shrink-0">
               {['bar', 'radar', 'heatmap'].map((tab) => (
                 <button
@@ -291,11 +312,9 @@ export default function GapAnalysisPage() {
             </div>
           </div>
 
-          {/* Tab Content rendering */}
           <div className="min-h-[260px] flex items-center justify-center">
             <AnimatePresence mode="wait">
               
-              {/* 1. Bar View */}
               {visTab === 'bar' && (
                 <motion.div
                   key="bar-tab"
@@ -304,7 +323,7 @@ export default function GapAnalysisPage() {
                   exit={{ opacity: 0, x: 10 }}
                   className="w-full space-y-4"
                 >
-                  {barSkills.map((item, idx) => (
+                  {dynamicBarSkills.map((item, idx) => (
                     <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                       <div className="w-28 text-xs font-bold text-[#111827]">{item.name}</div>
                       <div className="flex-1 h-3 bg-gray-100 rounded-full overflow-hidden relative">
@@ -331,7 +350,6 @@ export default function GapAnalysisPage() {
                 </motion.div>
               )}
 
-              {/* 2. Radar View */}
               {visTab === 'radar' && (
                 <motion.div
                   key="radar-tab"
@@ -353,7 +371,6 @@ export default function GapAnalysisPage() {
                 </motion.div>
               )}
 
-              {/* 3. Heat Map View */}
               {visTab === 'heatmap' && (
                 <motion.div
                   key="heatmap-tab"
@@ -389,7 +406,6 @@ export default function GapAnalysisPage() {
                         </span>
                       </div>
 
-                      {/* Floating tooltip */}
                       {hoveredCell === cell && (
                         <div className="absolute left-1/2 -top-12 -translate-x-1/2 z-40 bg-white border border-[#E5E7EB] rounded-lg px-2.5 py-1.5 shadow-lg text-[10px] font-bold text-[#111827] whitespace-nowrap pointer-events-none">
                           <p>{cell.skill}</p>
@@ -405,13 +421,10 @@ export default function GapAnalysisPage() {
           </div>
         </motion.div>
 
-        {/* ════════ ROW 3: TWO-COLUMN SPLIT ════════ */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
           
-          {/* Column A: Missing Skills */}
           <motion.div variants={itemVar} className="bg-[#F8FAFC] border border-[#E5E7EB] rounded-2xl p-6 lg:p-8 flex flex-col justify-between">
             <div>
-              {/* Header */}
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-base font-bold text-[#111827]">Missing Skills</h3>
                 <motion.div
@@ -423,36 +436,29 @@ export default function GapAnalysisPage() {
                 </motion.div>
               </div>
 
-              {/* Stacked skill items */}
               <div className="space-y-3.5">
-                {[
-                  { name: 'Three.js / WebGL', desc: 'Essential for the 3D visualization requirement.', level: 'Critical Gap', color: 'bg-red-50 text-red-500 border-red-200' },
-                  { name: 'React.js State Management', desc: 'Stronger complex state logic required for frontend.', level: 'Partial Match', color: 'bg-amber-50 text-amber-600 border-amber-200' },
-                ].map((item, idx) => (
+                {missingSkills.map((item, idx) => (
                   <motion.div
-                    key={item.name}
+                    key={item.name + idx}
                     whileHover={{ y: -2 }}
                     className="bg-white rounded-xl p-4 border border-[#E5E7EB] flex items-start justify-between gap-4 shadow-sm hover:shadow-md transition-all"
                   >
                     <div className="flex items-start gap-3">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${item.color}`}>
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border bg-red-50 text-red-500 border-red-200`}>
                         <Layers size={15} />
                       </div>
                       <div>
                         <h4 className="text-xs font-bold text-[#111827]">{item.name}</h4>
-                        <p className="text-[11px] text-[#6B7280] mt-1 leading-relaxed">{item.desc}</p>
+                        <p className="text-[11px] text-[#6B7280] mt-1 leading-relaxed">{item.impact}</p>
                       </div>
                     </div>
-                    <span className={`text-[9px] font-extrabold uppercase px-2.5 py-0.5 rounded-full tracking-wider
-                      ${item.level === 'Critical Gap' ? 'bg-[#FEF2F2] text-[#EF4444]' : 'bg-[#FFFBEB] text-[#F59E0B]'}
-                    `}>
-                      {item.level}
+                    <span className={`text-[9px] font-extrabold uppercase px-2.5 py-0.5 rounded-full tracking-wider bg-[#FEF2F2] text-[#EF4444]`}>
+                      Critical Gap
                     </span>
                   </motion.div>
                 ))}
               </div>
 
-              {/* Expandable Missing Experience */}
               <div className="mt-6 border-t border-[#E5E7EB] pt-4">
                 <button
                   onClick={() => setShowExpGaps(!showExpGaps)}
@@ -650,14 +656,14 @@ export default function GapAnalysisPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={pieData}
+                    data={dynamicPieData}
                     innerRadius={50}
                     outerRadius={65}
                     paddingAngle={3}
                     dataKey="value"
                     isAnimationActive
                   >
-                    {pieData.map((entry, index) => (
+                    {dynamicPieData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
@@ -665,13 +671,13 @@ export default function GapAnalysisPage() {
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-xl font-bold text-[#111827]">10</span>
+                <span className="text-xl font-bold text-[#111827]">{totalSkills}</span>
                 <span className="text-[8px] text-[#6B7280] font-bold uppercase tracking-wider">Total Skills</span>
               </div>
             </div>
 
             <div className="flex justify-between items-center text-[10px] font-bold text-[#6B7280] mt-4 pt-3 border-t border-[#F3F4F6]">
-              {pieData.map((p, idx) => (
+              {dynamicPieData.map((p, idx) => (
                 <div key={idx} className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full" style={{ background: p.color }} />
                   <span>{p.name}: {p.value}%</span>

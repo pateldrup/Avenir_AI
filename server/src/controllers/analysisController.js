@@ -141,7 +141,21 @@ ${resumeText}
   }
 };
 
+const getAnalysis = async (req, res) => {
+  try {
+    const analysis = await Analysis.findOne({ _id: req.params.id, user: req.user._id });
+    if (!analysis) {
+      return res.status(404).json({ message: 'Analysis not found' });
+    }
+    res.status(200).json(analysis);
+  } catch (error) {
+    console.error('Get analysis error:', error);
+    res.status(500).json({ message: 'Server error fetching analysis', error: error.message });
+  }
+};
+
 module.exports = {
   scrapeJobUrl,
   analyzeGap,
+  getAnalysis
 };

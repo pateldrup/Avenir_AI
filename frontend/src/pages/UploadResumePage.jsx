@@ -20,7 +20,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 
-export default function UploadResumePage() {
+export default function UploadResumePage({ onNext }) {
   const [loading, setLoading] = useState(true);
   const [file, setFile] = useState(null);
   const [uploadStatus, setUploadStatus] = useState('idle'); // idle | uploading | success
@@ -111,7 +111,6 @@ export default function UploadResumePage() {
       const token = localStorage.getItem('token');
       const res = await axios.post(`${import.meta.env.VITE_API_URL}/resumes/upload`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`
         },
         onUploadProgress: (progressEvent) => {
@@ -123,6 +122,7 @@ export default function UploadResumePage() {
       setUploadStatus('success');
       setShowToast(true);
       setParsedText(res.data.extractedText);
+      localStorage.setItem('avenir_resume_id', res.data.resumeId);
       triggerConfetti();
     } catch (err) {
       setUploadStatus('idle');
@@ -441,6 +441,15 @@ export default function UploadResumePage() {
                       >
                         <Eye size={14} />
                         Preview
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => onNext && onNext()}
+                        className="flex items-center gap-1.5 px-3.5 py-2 bg-[#2563EB] text-white text-xs font-semibold rounded-xl cursor-pointer"
+                      >
+                        Continue
+                        <ArrowRight size={14} />
                       </motion.button>
                       <motion.button
                         whileHover={{ scale: 1.02 }}

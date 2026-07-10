@@ -20,6 +20,7 @@ import {
   Info,
   Loader2,
 } from 'lucide-react';
+import axios from 'axios';
 
 /* ─── Mock Extracted Data ─── */
 const MOCK_EXTRACTED_JD = `Job Title: Senior AI Product Lead
@@ -38,7 +39,7 @@ Required Skills:
 • Excellent communication skills with the ability to translate complex AI research into user value.
 • Experience managing high-scale SaaS or developer API platforms.`;
 
-export default function JobDescriptionPage() {
+export default function JobDescriptionPage({ onNext }) {
   const [loading, setLoading] = useState(true);
   const [urlInput, setUrlInput] = useState('');
   const [urlError, setUrlError] = useState(null);
@@ -100,35 +101,43 @@ export default function JobDescriptionPage() {
     validateUrl(urlInput);
   };
 
-  // Simulate Fetch URL
-  const handleFetchUrl = () => {
+  // Fetch URL via Backend
+  const handleFetchUrl = async () => {
     if (!urlValid || !urlInput) {
       setUrlError('Please enter a valid URL first');
       return;
     }
 
-    // Success simulation for test URLs, otherwise custom mock behavior
     setFetching(true);
     setUrlError(null);
 
-    setTimeout(() => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/analysis/scrape`, { url: urlInput }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
       setFetching(false);
       setToastMessage('Job details extracted successfully!');
       setShowToast(true);
       
-      // Clear textarea before typing in new content
       setJdText('');
+      
+      const textToType = res.data.text || 'No content could be extracted.';
 
       // Typewriter streaming simulation for Right Card Textarea
       let index = 0;
       const interval = setInterval(() => {
-        setJdText((prev) => prev + MOCK_EXTRACTED_JD[index]);
+        setJdText((prev) => prev + textToType[index]);
         index++;
-        if (index >= MOCK_EXTRACTED_JD.length - 1) {
+        if (index >= textToType.length - 1) {
           clearInterval(interval);
         }
-      }, 5);
-    }, 2000);
+      }, 2); // Faster typing speed
+    } catch (err) {
+      setFetching(false);
+      setUrlError(err.response?.data?.message || 'Failed to fetch URL. Ensure it is accessible.');
+    }
   };
 
   // Switch to manual text scrolling & glow highlight
@@ -178,7 +187,7 @@ export default function JobDescriptionPage() {
   };
 
   // Submit trigger
-  const handleAnalyzeMatch = () => {
+  const handleAnalyzeMatch = async () => {
     if (!isFormValid()) {
       if (jdText.length > 0 && jdText.length < 50) {
         setJdError('This looks too short — add more detail for better analysis');
@@ -191,12 +200,42 @@ export default function JobDescriptionPage() {
     setJdError(null);
     setIsAnalyzing(true);
 
-    setTimeout(() => {
+    try {
+      const token = localStorage.getItem('token');
+      const resumeId = localStorage.getItem('avenir_resume_id');
+
+      if (!resumeId) {
+        setJdError('No resume uploaded. Please go back and upload your resume first.');
+        setIsAnalyzing(false);
+        return;
+      }
+
+      // Combine JD text and manual skills if any
+      const fullJdText = jdText + (manualSkills.length > 0 ? `\n\nRequired Skills:\n${manualSkills.join(', ')}` : '');
+
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/analysis/gap`, {
+        resumeId,
+        jobDescription: fullJdText,
+        jobTitle: manualTitle || 'Target Role',
+        company: manualCompany || 'Target Company'
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
       setIsAnalyzing(false);
-      setToastMessage('Analysis initiated successfully!');
+      
+      // Save analysis ID to local storage so GapAnalysisPage can read it
+      localStorage.setItem('avenir_analysis_id', res.data._id);
+
+      setToastMessage('Analysis completed successfully!');
       setShowToast(true);
-      alert('Mock analysis starting... Redirecting to Gap Analysis');
-    }, 2200);
+      
+      if (onNext) onNext();
+      
+    } catch (err) {
+      setIsAnalyzing(false);
+      setJdError(err.response?.data?.message || 'AI Engine failed to generate analysis.');
+    }
   };
 
   // Helpers for text counts
