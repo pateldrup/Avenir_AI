@@ -3,12 +3,14 @@ const cors = require('cors');
 
 const app = express();
 
-// Middlewares
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Basic route for testing
+const routes = require('./routes');
+
+app.use('/api', routes);
+
 app.get('/', (req, res) => {
   res.send('Avenir API is running...');
 });
