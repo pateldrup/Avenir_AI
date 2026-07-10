@@ -51,10 +51,34 @@ const DAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 /* ═══════════════ MAIN DASHBOARD ═══════════════ */
 export default function DashboardPage({ onNavigate }) {
   const [activeNav, setActiveNav] = useState('dashboard');
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem('avenir_theme') === 'dark';
+  });
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [settingsTab, setSettingsTab] = useState('general');
+
+  // Sync theme when activeNav changes (in case it was changed on SettingsPage)
+  useEffect(() => {
+    const isDark = localStorage.getItem('avenir_theme') === 'dark';
+    setDarkMode(isDark);
+  }, [activeNav]);
+
+  // Apply dark class and sync to settings object when darkMode changes
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', darkMode);
+    localStorage.setItem('avenir_theme', darkMode ? 'dark' : 'light');
+    try {
+      const raw = localStorage.getItem('avenir_general_settings');
+      const settings = raw ? JSON.parse(raw) : {};
+      if (settings.theme !== (darkMode ? 'dark' : 'light')) {
+        settings.theme = darkMode ? 'dark' : 'light';
+        localStorage.setItem('avenir_general_settings', JSON.stringify(settings));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, [darkMode]);
 
   // Resume upload states
   const [hasResume, setHasResume] = useState(() => localStorage.getItem('avenir_has_resume') === 'true');

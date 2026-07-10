@@ -38,9 +38,9 @@ export default function NotificationBell() {
       </button>
       <AnimatePresence>
         {open && (
-          <motion.div initial={{ opacity: 0, scale: 0.95, y: -6 }} animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -6 }} transition={{ duration: 0.16 }}
-            className="absolute right-0 top-11 z-50 w-72 bg-white/95 backdrop-blur-xl border border-[#E5E7EB] rounded-xl shadow-2xl overflow-hidden">
+          <motion.div initial={{ opacity: 0, scale: 0.95, y: 6 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 6 }} transition={{ duration: 0.16 }}
+            className="absolute left-[-100px] bottom-full mb-2 z-50 w-72 bg-white/95 backdrop-blur-xl border border-[#E5E7EB] rounded-xl shadow-2xl overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-[#E5E7EB]">
               <span className="text-xs font-bold text-[#111827]">Notifications</span>
               <button onClick={() => setOpen(false)} className="text-[#6B7280] hover:text-[#111827] cursor-pointer"><X size={14} /></button>

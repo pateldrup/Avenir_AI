@@ -74,3 +74,109 @@ body {
 .compact-mode .text-3xl {
   font-size: 1.5rem;
 }
+
+/* ─── Dark Mode Styles ─── */
+.dark body {
+  background-color: #0B0F19 !important;
+  color: #F3F4F6 !important;
+}
+
+/* Background overrides */
+.dark .bg-white {
+  background-color: #161D30 !important;
+}
+.dark .bg-\[\#F8FAFC\] {
+  background-color: #0B0F19 !important;
+}
+.dark .bg-\[\#F3F4F6\] {
+  background-color: #1F293D !important;
+}
+.dark .bg-\[\#EEF2FF\] {
+  background-color: #1E2548 !important;
+}
+.dark .bg-\[\#EFF6FF\] {
+  background-color: #1E293B !important;
+}
+
+/* Text overrides */
+.dark .text-\[\#111827\] {
+  color: #F9FAFB !important;
+}
+.dark .text-\[\#6B7280\] {
+  color: #9CA3AF !important;
+}
+.dark .text-\[\#4B5563\] {
+  color: #E5E7EB !important;
+}
+.dark .text-gray-900 {
+  color: #F9FAFB !important;
+}
+.dark .text-gray-700 {
+  color: #E5E7EB !important;
+}
+.dark .text-gray-500 {
+  color: #9CA3AF !important;
+}
+
+/* Border overrides */
+.dark .border-\[\#E5E7EB\] {
+  border-color: #242F4C !important;
+}
+.dark .border-\[\#F3F4F6\] {
+  border-color: #242F4C !important;
+}
+.dark .divide-\[\#F3F4F6\] > * + * {
+  border-color: #242F4C !important;
+}
+
+/* Sidebar Specifics */
+.dark aside {
+  background-color: #111827 !important;
+  border-right-color: #242F4C !important;
+}
+.dark aside .border-b,
+.dark aside .border-t {
+  border-color: #242F4C !important;
+}
+.dark aside button:hover {
+  background-color: #1F293D !important;
+}
+
+/* Inputs and Forms */
+.dark input, 
+.dark select, 
+.dark textarea {
+  background-color: #111827 !important;
+  border-color: #242F4C !important;
+  color: #F3F4F6 !important;
+}
+.dark input::placeholder {
+  color: #6B7280 !important;
+}
+
+/* Dropdown specific overrides */
+.dark .bg-white\/95 {
+  background-color: rgba(22, 29, 48, 0.95) !important;
+}
+.dark .hover\:bg-\[\#F8FAFC\]:hover {
+  background-color: #1E293B !important;
+}
+.dark .hover\:bg-red-50:hover {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Tooltip and popup specifics */
+.dark .shadow-lg,
+.dark .shadow-xl,
+.dark .shadow-2xl {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* ─── Hide Scrollbars Globally ─── */
+::-webkit-scrollbar {
+  display: none !important;
+}
+* {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE and Edge */
+}
