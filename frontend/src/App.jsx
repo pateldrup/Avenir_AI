@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
 import SignupPage from './components/SignupPage';
+import DashboardPage from './components/DashboardPage';
 
 
 import './App.css';
@@ -55,6 +56,19 @@ export default function App() {
             className="w-full"
           >
             <SignupPage onNavigate={handleNavigate} />
+          </motion.div>
+        )}
+
+        {view === 'dashboard' && (
+          <motion.div
+            key="dashboard-view"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            className="w-full h-screen"
+          >
+            <DashboardPage onNavigate={handleNavigate} />
           </motion.div>
         )}
 
