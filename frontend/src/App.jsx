@@ -1,55 +1,64 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { ToastProvider } from './context/ToastContext'
-import AuthLayout from './layouts/AuthLayout'
-import LoginPage from './pages/auth/LoginPage'
-import SignupPage from './pages/auth/SignupPage'
-import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
-import ResetPasswordPage from './pages/auth/ResetPasswordPage'
-import VerifyEmailPage from './pages/auth/VerifyEmailPage'
+import React, { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import LandingPage from './components/LandingPage';
+import LoginPage from './components/LoginPage';
+import SignupPage from './components/SignupPage';
 
-// Placeholder Dashboard
-function Dashboard() {
-  return (
-    <div className="min-h-screen flex items-center justify-center"
-      style={{ background: 'linear-gradient(135deg, #0B0F19, #1e1b4b)' }}>
-      <div className="text-center text-white">
-        <h1 className="text-4xl font-bold mb-3">🎉 Dashboard</h1>
-        <p className="text-indigo-300 mb-6">You are logged in to CareerAI!</p>
-        <a
-          href="/auth/login"
-          className="px-6 py-3 rounded-xl font-semibold text-white text-sm"
-          style={{ background: 'linear-gradient(135deg, #2563EB, #7C3AED)' }}
-        >
-          ← Back to Login
-        </a>
-      </div>
-    </div>
-  )
-}
+
+import './App.css';
 
 export default function App() {
+  const [view, setView] = useState('landing');
+
+  // Page switcher navigation helper
+  const handleNavigate = (targetView) => {
+    setView(targetView);
+  };
+
   return (
-    <BrowserRouter>
-      <ToastProvider>
-        <Routes>
-          {/* Auth routes */}
-          <Route path="/auth" element={<AuthLayout />}>
-            <Route index element={<Navigate to="login" replace />} />
-            <Route path="login" element={<LoginPage />} />
-            <Route path="signup" element={<SignupPage />} />
-            <Route path="forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="reset-password" element={<ResetPasswordPage />} />
-            <Route path="verify-email" element={<VerifyEmailPage />} />
-          </Route>
+    <div className="min-h-screen bg-[#F8FAFC]">
+      <AnimatePresence mode="wait">
+        
+        {view === 'landing' && (
+          <motion.div
+            key="landing-view"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="w-full"
+          >
+            <LandingPage onNavigate={handleNavigate} />
+          </motion.div>
+        )}
 
-          {/* App routes */}
-          <Route path="/dashboard" element={<Dashboard />} />
+        {view === 'login' && (
+          <motion.div
+            key="login-view"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.3 }}
+            className="w-full"
+          >
+            <LoginPage onNavigate={handleNavigate} />
+          </motion.div>
+        )}
 
-          {/* Default redirect */}
-          <Route path="/" element={<Navigate to="/auth/login" replace />} />
-          <Route path="*" element={<Navigate to="/auth/login" replace />} />
-        </Routes>
-      </ToastProvider>
-    </BrowserRouter>
-  )
+        {view === 'signup' && (
+          <motion.div
+            key="signup-view"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.3 }}
+            className="w-full"
+          >
+            <SignupPage onNavigate={handleNavigate} />
+          </motion.div>
+        )}
+
+      </AnimatePresence>
+    </div>
+  );
 }

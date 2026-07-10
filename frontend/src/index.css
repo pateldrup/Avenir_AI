@@ -1,112 +1,42 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
 
-*, *::before, *::after { box-sizing: border-box; }
+
+@theme {
+  --color-primary: #2563EB;
+  --color-secondary: #4F46E5;
+  --color-accent: #7C3AED;
+  --color-bg-base: #F8FAFC;
+  --color-card-bg: #FFFFFF;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  --color-borders: #E5E7EB;
+
+  --font-sans: 'Inter', sans-serif;
+
+  --shadow-card: 0 10px 30px rgba(15, 23, 42, 0.08);
+  --shadow-card-hover: 0 20px 50px rgba(37, 99, 235, 0.15);
+
+  --radius-card: 16px;
+  --radius-button: 12px;
+  --radius-input: 12px;
+  --radius-modal: 20px;
+}
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   margin: 0;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #4F46E5; border-radius: 3px; }
-
-/* OTP input */
-.otp-input {
-  width: 48px;
-  height: 56px;
-  text-align: center;
-  font-size: 1.25rem;
-  font-weight: 700;
-  border: 2px solid #E5E7EB;
-  border-radius: 12px;
-  outline: none;
-  transition: all 0.2s ease;
-  background: rgba(255,255,255,0.9);
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  background-color: #F8FAFC;
   color: #111827;
 }
-.otp-input:focus {
-  border-color: #2563EB;
-  box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
-}
-.otp-input.filled {
-  border-color: #4F46E5;
-  background: rgba(79,70,229,0.05);
-}
-.otp-input.error {
-  border-color: #EF4444;
-  animation: shake 0.4s ease;
-}
 
-@keyframes shake {
-  0%,100% { transform: translateX(0); }
-  20% { transform: translateX(-8px); }
-  40% { transform: translateX(8px); }
-  60% { transform: translateX(-8px); }
-  80% { transform: translateX(4px); }
-}
-
-.shake { animation: shake 0.4s ease; }
-
-/* Auth input focus ring */
-.auth-input-wrapper:focus-within .auth-input-border {
-  border-color: #2563EB;
-  box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
-}
-.auth-input-wrapper.error-state .auth-input-border {
-  border-color: #EF4444;
-  box-shadow: 0 0 0 3px rgba(239,68,68,0.10);
-}
-
-/* Glass card */
-.glass-card {
-  background: rgba(255,255,255,0.85);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255,255,255,0.3);
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(15,23,42,0.08), 0 1px 0 rgba(255,255,255,0.5) inset;
-}
-
-/* Gradient text */
-.gradient-text {
-  background: linear-gradient(135deg, #2563EB, #7C3AED);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Gradient button */
-.gradient-btn {
-  background: linear-gradient(135deg, #2563EB, #7C3AED);
-  transition: all 0.2s ease;
-}
-.gradient-btn:hover {
-  background: linear-gradient(135deg, #3B82F6, #8B5CF6);
-  box-shadow: 0 8px 25px rgba(37,99,235,0.35);
-}
-
-/* Custom checkbox */
-.custom-checkbox:checked {
-  background: linear-gradient(135deg, #2563EB, #7C3AED);
-  border-color: #2563EB;
-}
-
-/* Strength bar transition */
-.strength-bar {
-  transition: width 0.4s ease, background-color 0.4s ease;
-}
-
-/* Social button */
-.social-btn {
-  transition: all 0.2s ease;
-  border: 1px solid #E5E7EB;
-}
-.social-btn:hover {
-  box-shadow: 0 4px 15px rgba(15,23,42,0.12);
-  transform: translateY(-1px);
+#root {
+  width: 100%;
+  min-height: 100vh;
 }
