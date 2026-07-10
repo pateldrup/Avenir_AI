@@ -5,7 +5,6 @@ import {
   History, Settings, User, Sun, Moon
 } from 'lucide-react';
 import ProfileDropdown from './ProfileDropdown';
-import NotificationBell from './NotificationBell';
 
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -70,23 +69,19 @@ export default function Sidebar({
         </motion.button>
       </nav>
 
-      <div className="px-4 pb-6 pt-4 flex flex-col gap-2 mt-auto border-t border-[#E5E7EB]">
-        <div className="w-full">
+      <div className="px-4 pb-6 pt-4 mt-auto border-t border-[#E5E7EB] flex items-center justify-between gap-2">
+        <div className="flex-1 min-w-0">
           <ProfileDropdown onNavigate={onNavigate} onDashboardNav={onDashboardNav} />
         </div>
-        <div className="flex items-center justify-center gap-3">
-          <NotificationBell />
-          <div className="w-px h-5 bg-[#E5E7EB] mx-1" />
-          <motion.button whileTap={{ scale: 0.88 }} onClick={() => setDarkMode(p => !p)} id="dark-mode-toggle"
-            className="p-2 rounded-full hover:bg-[#F3F4F6] transition-colors cursor-pointer text-[#6B7280]">
-            <AnimatePresence mode="wait" initial={false}>
-              {darkMode
-                ? <motion.span key="sun" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.18 }}><Sun size={20} /></motion.span>
-                : <motion.span key="moon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.18 }}><Moon size={20} /></motion.span>
-              }
-            </AnimatePresence>
-          </motion.button>
-        </div>
+        <motion.button whileTap={{ scale: 0.88 }} onClick={() => setDarkMode(p => !p)} id="dark-mode-toggle"
+          className="p-2 rounded-full hover:bg-[#F3F4F6] transition-colors cursor-pointer text-[#6B7280] shrink-0">
+          <AnimatePresence mode="wait" initial={false}>
+            {darkMode
+              ? <motion.span key="sun" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.18 }}><Sun size={20} /></motion.span>
+              : <motion.span key="moon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.18 }}><Moon size={20} /></motion.span>
+            }
+          </AnimatePresence>
+        </motion.button>
       </div>
     </aside>
   );
