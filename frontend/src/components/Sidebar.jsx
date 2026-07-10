@@ -24,7 +24,8 @@ export default function Sidebar({
   setActiveNav,
   darkMode,
   setDarkMode,
-  onNavigate
+  onNavigate,
+  onDashboardNav
 }) {
   return (
     <aside className={`fixed lg:static z-40 h-full w-[260px] bg-white border-r border-[#E5E7EB] flex flex-col shrink-0 transition-transform duration-300
@@ -77,7 +78,7 @@ export default function Sidebar({
 
       <div className="px-4 pb-6 pt-4 flex flex-col gap-2 mt-auto border-t border-[#E5E7EB]">
         <div className="w-full">
-          <ProfileDropdown onNavigate={onNavigate} />
+          <ProfileDropdown onNavigate={onNavigate} onDashboardNav={onDashboardNav} />
         </div>
         <div className="flex items-center justify-center gap-3">
           <NotificationBell />
