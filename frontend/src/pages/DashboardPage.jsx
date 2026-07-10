@@ -24,6 +24,7 @@ import { LineTooltip, BarTooltip } from '../components/Tooltips';
 import KebabMenu from '../components/KebabMenu';
 import NotificationBell from '../components/NotificationBell';
 import ProfileDropdown from '../components/ProfileDropdown';
+import Sidebar from '../components/Sidebar';
 
 
 /* ─── Mock Data ─── */
@@ -42,15 +43,6 @@ const interviewHistory = [
   { topic: 'System Design', score: '8/10', date: 'Jul 8, 2024', colorClass: 'text-[#2563EB]' },
   { topic: 'Behavioral Questions', score: '9/10', date: 'Jul 5, 2024', colorClass: 'text-[#7C3AED]' },
   { topic: 'Technical Deep-Dive', score: '7/10', date: 'Jul 1, 2024', colorClass: 'text-[#10B981]' },
-];
-const navItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'upload', label: 'Upload Resume', icon: Upload },
-  { id: 'job', label: 'Job Description', icon: FileText },
-  { id: 'gap', label: 'Gap Analysis', icon: GitCompare },
-  { id: 'prep', label: 'Prep Plan', icon: ClipboardList },
-  { id: 'interview', label: 'Mock Interview', icon: Mic },
-  { id: 'history', label: 'History', icon: History },
 ];
 const BAR_COLORS = ['#2563EB', '#4F46E5', '#7C3AED', '#10B981'];
 const SPARKLINE = [40, 55, 48, 62, 58, 72, 78];
@@ -250,7 +242,7 @@ export default function DashboardPage({ onNavigate }) {
                 Welcome back,{' '}
                 <motion.span initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.5 }}
                   style={{ background: 'linear-gradient(135deg,#2563EB,#7C3AED)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                  Alex.
+                  {localStorage.getItem('avenir_user_name')?.split(' ')[0] || 'Guest'}.
                 </motion.span>
               </h1>
               <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.65 }}
@@ -631,39 +623,7 @@ export default function DashboardPage({ onNavigate }) {
               </div>
             </div>
 
-            {/* 4. PROMO BANNER */}
-            <motion.div variants={itemVar}
-              whileHover={{ scale: 1.01, boxShadow: '0 24px 60px rgba(79,70,229,0.28)' }}
-              transition={{ duration: 0.2 }}
-              className="relative overflow-hidden rounded-2xl p-8 mb-8 cursor-default"
-              style={{ background: 'linear-gradient(135deg,#1E1B4B 0%,#4F46E5 55%,#7C3AED 100%)' }}>
 
-              <svg className="absolute right-0 top-0 h-full opacity-20 pointer-events-none" viewBox="0 0 420 220" fill="none"
-                style={{ mixBlendMode: 'screen' }}>
-                <motion.path d="M0 110 Q 105 30 210 110 T 420 110" stroke="white" strokeWidth="2" fill="none"
-                  initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ duration: 2, ease: 'easeInOut', delay: 1 }} />
-                <motion.path d="M0 145 Q 105 65 210 145 T 420 145" stroke="white" strokeWidth="1.5" fill="none"
-                  initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 0.6 }}
-                  transition={{ duration: 2, ease: 'easeInOut', delay: 1.3 }} />
-                <motion.path d="M0 75 Q 105 -5 210 75 T 420 75" stroke="white" strokeWidth="1" fill="none"
-                  initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 0.4 }}
-                  transition={{ duration: 2, ease: 'easeInOut', delay: 1.6 }} />
-                <circle cx="340" cy="60" r="50" fill="white" fillOpacity="0.04" />
-                <circle cx="370" cy="155" r="35" fill="white" fillOpacity="0.06" />
-              </svg>
-
-              <div className="relative z-10 max-w-xl">
-                <h2 className="text-xl sm:text-2xl font-extrabold text-white mb-2">Unlock AI Interview Coaching</h2>
-                <p className="text-white/80 text-sm font-medium mb-5 leading-relaxed">
-                  Practice with our real-time voice coach and get instant feedback on your tone and content.
-                </p>
-                <motion.button whileHover={{ x: 4 }} whileTap={{ scale: 0.97 }}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-white/15 hover:bg-white/25 border border-white/40 rounded-xl text-white font-bold text-sm backdrop-blur-sm transition-all cursor-pointer">
-                  Explore Coaching Features<ArrowRight size={15} />
-                </motion.button>
-              </div>
-            </motion.div>
 
             {/* FOOTER */}
             <footer className="border-t border-[#E5E7EB] pt-5 pb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">

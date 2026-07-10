@@ -111,7 +111,6 @@ export default function UploadResumePage({ onNext }) {
       const token = localStorage.getItem('token');
       const res = await axios.post(`${import.meta.env.VITE_API_URL}/resumes/upload`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`
         },
         onUploadProgress: (progressEvent) => {

@@ -36,6 +36,8 @@ export default function LoginPage({ onNavigate }) {
         password
       });
       localStorage.setItem('token', res.data.token);
+      localStorage.setItem('avenir_user_name', res.data.name);
+      localStorage.setItem('avenir_user_email', res.data.email);
       onNavigate('dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid email or password');
@@ -51,6 +53,8 @@ export default function LoginPage({ onNavigate }) {
         token: credentialResponse.credential,
       });
       localStorage.setItem('token', res.data.token);
+      localStorage.setItem('avenir_user_name', res.data.name);
+      localStorage.setItem('avenir_user_email', res.data.email);
       onNavigate('dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Google authentication failed');
