@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Settings, Shield, Code, Edit2, ChevronDown, Globe, Bell, Monitor, Check, Lock, Eye, EyeOff, Smartphone, LogOut, MapPin } from 'lucide-react';
+import { User, Settings, Shield, Code, Edit2, ChevronDown, Globe, Bell, Monitor, Check, Lock, Eye, EyeOff, LogOut, MapPin } from 'lucide-react';
 
 /* ─── Toggle Switch Component ─── */
 function Toggle({ checked, onChange }) {
@@ -303,21 +303,6 @@ function SecurityTab({ settings, updateSetting, profile }) {
         )}
       </div>
 
-      {/* ── Two-Factor Authentication ── */}
-      <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm p-8">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#F5F3FF] flex items-center justify-center">
-              <Smartphone size={18} className="text-[#7C3AED]" />
-            </div>
-            <div>
-              <h2 className="text-base font-bold text-[#111827]">Two-Factor Authentication</h2>
-              <p className="text-xs text-[#6B7280]">Add an extra layer of security to your account.</p>
-            </div>
-          </div>
-          <Toggle checked={settings.twoFactorAuth} onChange={(v) => updateSetting('twoFactorAuth', v)} />
-        </div>
-      </div>
     </motion.div>
   );
 }

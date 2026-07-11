@@ -62,7 +62,7 @@ const updateUserSettings = async (req, res) => {
     const user = await User.findById(req.user._id);
 
     if (user) {
-      user.settings = { ...user.settings, ...req.body };
+      user.settings = { ...user.settings.toObject(), ...req.body };
       const updatedUser = await user.save();
       res.json(updatedUser.settings);
     } else {
