@@ -7,7 +7,12 @@ const MockInterviewPage = () => {
   const [interviewSession, setInterviewSession] = useState(null);
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
+  const [interimValue, setInterimValue] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [triggerAutoSend, setTriggerAutoSend] = useState(false);
+  const [silenceRemaining, setSilenceRemaining] = useState(null);
+  const lastSpokeTime = useRef(Date.now());
+  const checkIntervalRef = useRef(null);
   
   // Voice states
   const [isListening, setIsListening] = useState(false);
@@ -27,6 +32,39 @@ const MockInterviewPage = () => {
   };
   useEffect(() => scrollToBottom(), [messages, isSending]);
 
+  // Silence Timeout Logic
+  useEffect(() => {
+    if (isListening) {
+      lastSpokeTime.current = Date.now();
+      setSilenceRemaining(4);
+      
+      checkIntervalRef.current = setInterval(() => {
+        const elapsed = (Date.now() - lastSpokeTime.current) / 1000;
+        const remaining = Math.max(0, 4 - elapsed);
+        setSilenceRemaining(Math.ceil(remaining));
+        
+        if (remaining <= 0) {
+          clearInterval(checkIntervalRef.current);
+          setTriggerAutoSend(true);
+        }
+      }, 200);
+    } else {
+      if (checkIntervalRef.current) clearInterval(checkIntervalRef.current);
+      setSilenceRemaining(null);
+    }
+    return () => {
+      if (checkIntervalRef.current) clearInterval(checkIntervalRef.current);
+    }
+  }, [isListening]);
+
+  useEffect(() => {
+    if (triggerAutoSend) {
+      setTriggerAutoSend(false);
+      handleSend(true);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [triggerAutoSend]);
+
   // Setup Speech Recognition
   useEffect(() => {
     setMounted(true);
@@ -39,15 +77,24 @@ const MockInterviewPage = () => {
       recognition.interimResults = true;
       
       recognition.onresult = (event) => {
-        let currentTranscript = '';
+        let currentFinal = '';
+        let currentInterim = '';
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const transcript = event.results[i][0].transcript;
           if (event.results[i].isFinal) {
-            setInputValue((prev) => prev + transcript + ' ');
+            currentFinal += transcript + ' ';
           } else {
-            currentTranscript += transcript;
+            currentInterim += transcript;
           }
         }
+        
+        if (currentFinal) {
+          setInputValue((prev) => prev + currentFinal);
+        }
+        setInterimValue(currentInterim);
+        
+        lastSpokeTime.current = Date.now();
+        setSilenceRemaining(4);
       };
 
       recognition.onerror = (event) => {
@@ -87,9 +134,28 @@ const MockInterviewPage = () => {
   // Start Interview via API
   const startInterview = async () => {
     try {
-      const analysisId = localStorage.getItem('avenir_analysis_id');
+      let analysisId = localStorage.getItem('avenir_analysis_id');
       const token = localStorage.getItem('token');
-      if (!analysisId || !token) return;
+      if (!token) return;
+
+      // Fallback: If no analysisId, fetch the most recent one
+      if (!analysisId) {
+        const histRes = await fetch(`${import.meta.env.VITE_API_URL}/users/history`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (histRes.ok) {
+          const histData = await histRes.json();
+          if (histData.analyses && histData.analyses.length > 0) {
+            analysisId = histData.analyses[0]._id;
+            // Optionally, we could set it in local storage here
+          }
+        }
+      }
+
+      if (!analysisId) {
+        setMessages([{ role: 'interviewer', content: 'No recent analysis found. Please run a job description analysis first to start a mock interview.' }]);
+        return;
+      }
 
       const res = await fetch(`${import.meta.env.VITE_API_URL}/interviews/start`, {
         method: 'POST',
@@ -113,18 +179,30 @@ const MockInterviewPage = () => {
           const firstQuestion = visibleMessages[0].content;
           speakText(firstQuestion);
         }
+      } else {
+        setMessages([{ role: 'interviewer', content: 'Failed to connect to the AI interviewer service. Please ensure the backend and AI models are running.' }]);
       }
     } catch (error) {
       console.error("Error starting interview:", error);
+      setMessages([{ role: 'interviewer', content: 'An unexpected error occurred while starting the interview.' }]);
     }
   };
 
   // Submit Answer
-  const handleSend = async () => {
-    if (!inputValue.trim() || !interviewSession || isSending) return;
+  const handleSend = async (isAuto = false) => {
+    let answer = (inputValue + ' ' + interimValue).trim();
+    
+    // If it's an auto-send and the user didn't say anything
+    if (!answer && isAuto === true) {
+      answer = "[Candidate remained silent]";
+    }
 
-    const answer = inputValue.trim();
+    if (!answer || !interviewSession || isSending) return;
+
     setInputValue('');
+    setInterimValue('');
+    setSilenceRemaining(null);
+    if (checkIntervalRef.current) clearInterval(checkIntervalRef.current);
     
     // Optimistic UI update
     setMessages(prev => [...prev, { role: 'candidate', content: answer }]);
@@ -470,15 +548,15 @@ const MockInterviewPage = () => {
         <div className="flex-1 relative">
           <input 
             type="text"
-            value={inputValue}
+            value={inputValue + interimValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyPress}
-            placeholder={isListening ? "Listening..." : "Type your response..."}
+            placeholder={isListening ? `Listening... (Auto-send in ${silenceRemaining}s)` : "Type your response..."}
             className="w-full bg-[#EFF6FF] rounded-2xl h-[52px] pl-5 pr-12 border border-[#BFDBFE]/50 text-[#1E3A8A] text-[13px] font-medium shadow-inner focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30 transition-all placeholder:text-[#93C5FD]"
           />
           <button 
             onClick={handleSend}
-            disabled={!inputValue.trim() || isSending}
+            disabled={(!inputValue.trim() && !interimValue.trim()) || isSending}
             className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-xl bg-[#2563EB] text-white hover:bg-[#1D4ED8] disabled:opacity-50 disabled:hover:bg-[#2563EB] transition-colors"
           >
             <Send size={16} />
@@ -488,7 +566,7 @@ const MockInterviewPage = () => {
         <div className="text-center px-6 border-l border-[#E5E7EB] shrink-0 hidden sm:block">
           <p className="text-[9px] font-bold text-[#6B7280] uppercase tracking-widest mb-1">Status</p>
           <p className="text-[13px] font-extrabold text-[#111827]">
-            {isSending ? 'Thinking...' : isListening ? 'Listening...' : 'Active'}
+            {isSending ? 'Thinking...' : isListening ? `Listening... ${silenceRemaining !== null ? `(${silenceRemaining}s)` : ''}` : 'Active'}
           </p>
         </div>
         

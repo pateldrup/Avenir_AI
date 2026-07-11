@@ -115,7 +115,9 @@ Output the response STRICTLY as a JSON object with the following schema:
   "atsScore": Number,
   "matchedSkills": ["Skill1", "Skill2"],
   "missingSkills": ["Skill3", "Skill4"],
-  "feedback": "Your overall feedback here."
+  "feedback": "Your overall feedback here.",
+  "extractedJobTitle": "String (Extract the job title from the JD. If none is found, infer one based on the description, e.g., 'Full Stack Developer')",
+  "extractedCompany": "String (Extract the company name from the JD if present, else output 'Unknown Company')"
 }
 Do not include any markdown formatting, backticks, or other text outside the JSON object. Just the raw JSON.
 `;
@@ -150,11 +152,22 @@ ${resumeText}
     }
 
     // 4. Save to Database
+    let finalJobTitle = jobTitle;
+    let finalCompany = company;
+
+    // If the frontend sent defaults, override them with the AI-extracted values
+    if (!finalJobTitle || finalJobTitle === 'Target Role') {
+      finalJobTitle = parsedData.extractedJobTitle || 'Target Role';
+    }
+    if (!finalCompany || finalCompany === 'Target Company') {
+      finalCompany = parsedData.extractedCompany || 'Target Company';
+    }
+
     const analysis = await Analysis.create({
       user: req.user._id,
       resume: resumeId,
-      jobTitle: jobTitle || 'Target Role',
-      company: company || 'Target Company',
+      jobTitle: finalJobTitle,
+      company: finalCompany,
       atsScore: parsedData.atsScore || 0,
       matchedSkills: parsedData.matchedSkills || [],
       missingSkills: parsedData.missingSkills || [],
