@@ -9,8 +9,6 @@ import ProfileDropdown from './ProfileDropdown';
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'upload', label: 'Upload Resume', icon: Upload },
-  { id: 'job', label: 'Job Description', icon: FileText },
-  { id: 'gap', label: 'Gap Analysis', icon: GitCompare },
   { id: 'prep', label: 'Prep Plan', icon: ClipboardList },
   { id: 'interview', label: 'Mock Interview', icon: Mic },
   { id: 'history', label: 'History', icon: History },
@@ -77,15 +75,6 @@ export default function Sidebar({
         <div className="flex-1 min-w-0">
           <ProfileDropdown onNavigate={onNavigate} onDashboardNav={onDashboardNav} />
         </div>
-        <motion.button whileTap={{ scale: 0.88 }} onClick={() => setDarkMode(p => !p)} id="dark-mode-toggle"
-          className="p-2 rounded-full hover:bg-[#F3F4F6] transition-colors cursor-pointer text-[#6B7280] shrink-0">
-          <AnimatePresence mode="wait" initial={false}>
-            {darkMode
-              ? <motion.span key="sun" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.18 }}><Sun size={20} /></motion.span>
-              : <motion.span key="moon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.18 }}><Moon size={20} /></motion.span>
-            }
-          </AnimatePresence>
-        </motion.button>
       </div>
     </aside>
   );

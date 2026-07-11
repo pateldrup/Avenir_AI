@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Upload, FileText, GitCompare, ClipboardList, Mic,
   History, BarChart2, Settings, Search, Bell, Moon, Sun, ChevronRight,
@@ -50,7 +51,26 @@ const DAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
 /* ═══════════════ MAIN DASHBOARD ═══════════════ */
 export default function DashboardPage({ onNavigate }) {
-  const [activeNav, setActiveNav] = useState('dashboard');
+  const navigate = useNavigate();
+  const location = useLocation();
+  const currentPath = location.pathname.split('/')[2] || 'dashboard';
+  const [activeNav, setActiveNav] = useState(currentPath);
+
+  useEffect(() => {
+    if (activeNav === 'dashboard') {
+      if (location.pathname !== '/dashboard') navigate('/dashboard', { replace: true });
+    } else {
+      if (location.pathname !== `/dashboard/${activeNav}`) navigate(`/dashboard/${activeNav}`, { replace: true });
+    }
+  }, [activeNav, navigate]);
+
+  useEffect(() => {
+    const path = location.pathname.split('/')[2] || 'dashboard';
+    if (path !== activeNav) {
+      setActiveNav(path);
+    }
+  }, [location.pathname]);
+
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem('avenir_theme') === 'dark';
   });

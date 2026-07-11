@@ -37,7 +37,8 @@ export default function ProfileDropdown({ onNavigate, onDashboardNav }) {
     };
   }, []);
 
-  const fullName = profile?.fullName || 'Alex Mercer';
+  const storedName = localStorage.getItem('avenir_user_name');
+  const fullName = profile?.fullName || storedName || 'Alex Mercer';
   const photoUrl = profile?.photoUrl || '';
   const initials = fullName
     .split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
