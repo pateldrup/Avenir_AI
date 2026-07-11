@@ -97,6 +97,18 @@ body {
 .dark .bg-\[\#EFF6FF\] {
   background-color: #1E293B !important;
 }
+.dark .bg-white\/70 {
+  background-color: rgba(22, 29, 48, 0.7) !important;
+}
+.dark .bg-\[\#F5F3FF\] {
+  background-color: #25183A !important;
+}
+.dark .bg-gray-50 {
+  background-color: #111827 !important;
+}
+.dark .border-gray-100 {
+  border-color: #242F4C !important;
+}
 
 /* Text overrides */
 .dark .text-\[\#111827\] {

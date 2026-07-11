@@ -306,7 +306,7 @@ export default function UploadResumePage({ onNext }) {
                       animate={{
                         scale: isDragActive ? 1.01 : 1,
                         borderColor: error ? '#EF4444' : isDragActive ? '#2563EB' : '#93C5FD',
-                        backgroundColor: isDragActive ? 'rgba(37,99,235,0.02)' : 'rgba(255,255,255,1)',
+                        backgroundColor: isDragActive ? 'rgba(37,99,235,0.05)' : 'transparent',
                       }}
                       className="border-2 border-dashed rounded-2xl flex flex-col items-center justify-center py-16 px-6 cursor-pointer group transition-colors"
                       style={{ outline: 'none' }}
@@ -477,18 +477,7 @@ export default function UploadResumePage({ onNext }) {
           </motion.div>
 
           {/* Dropzone Footer Links */}
-          <motion.div variants={itemVar} className="flex justify-between items-center text-xs mt-2 px-1">
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                alert('Downloading sample resume...');
-              }}
-              className="flex items-center gap-1.5 font-bold text-[#2563EB] hover:underline cursor-pointer"
-            >
-              <Download size={14} />
-              Download Sample Resume
-            </a>
+          <motion.div variants={itemVar} className="flex justify-center items-center text-xs mt-2 px-1">
             <span className="text-[#6B7280]">
               By uploading, you agree to our{' '}
               <a href="#" className="font-semibold text-[#111827] hover:underline">
